@@ -38,37 +38,51 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md border-border bg-card shadow-lg">
-        <div className="p-6 md:p-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Login</h1>
-          <p className="text-muted-foreground mb-8">Welcome back to the Student Failure Detection System</p>
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background Image with Overlay */}
+      <div 
+        className="absolute inset-0 z-0 bg-cover bg-center transition-transform duration-[20000ms] scale-110"
+        style={{ backgroundImage: 'url("/bg-auth.jpg")' }}
+      />
+      <div className="absolute inset-0 z-1 bg-slate-950/70 backdrop-blur-[1px]" />
+
+      <Card className="w-full max-w-md bg-slate-900/60 backdrop-blur-xl border-slate-700/50 shadow-2xl relative z-10 animate-in fade-in zoom-in duration-500">
+        <div className="p-8">
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4 border border-primary/20">
+              <span className="text-3xl">🛡️</span>
+            </div>
+            <h1 className="text-3xl font-black text-white tracking-tight">Welcome Back</h1>
+            <p className="text-sm text-slate-400 mt-2 font-medium">Log in to manage your student project risk</p>
+          </div>
 
           {error && (
-            <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
-              <p className="text-destructive text-sm">{error}</p>
+            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl animate-in slide-in-from-top-2">
+              <p className="text-red-400 text-xs font-bold text-center flex items-center justify-center gap-2">
+                <span>⚠️</span> {error}
+              </p>
             </div>
           )}
 
           <form onSubmit={handleLogin} className="space-y-6">
             <FieldGroup>
-              <FieldLabel>Email Address</FieldLabel>
+              <FieldLabel className="text-slate-200">Email Address</FieldLabel>
               <Input
                 type="email"
-                placeholder="your@college.edu"
+                placeholder="name@university.edu"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                className="bg-slate-800/50 border-slate-700/50 text-white focus:ring-primary h-12"
               />
-              <p className="text-xs text-muted-foreground mt-2">Demo: alice@college.edu or james.miller@college.edu</p>
             </FieldGroup>
 
             <FieldGroup>
               <div className="flex items-center justify-between">
-                <FieldLabel>Password</FieldLabel>
+                <FieldLabel className="text-slate-200">Password</FieldLabel>
                 <Link 
                   href="/forgot-password" 
-                  className="text-xs text-primary hover:underline hover:text-primary/80 transition-colors"
+                  className="text-xs font-bold text-primary hover:text-primary/80 transition-colors"
                 >
                   Forgot Password?
                 </Link>
@@ -79,25 +93,25 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                className="bg-slate-800/50 border-slate-700/50 text-white focus:ring-primary h-12"
               />
-              <p className="text-xs text-muted-foreground mt-2">Demo password: password123</p>
             </FieldGroup>
 
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+              className="w-full h-12 bg-primary text-white font-black uppercase tracking-widest hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all active:scale-[0.98]"
             >
-              {loading ? 'Logging in...' : 'Login'}
+              {loading ? 'Authenticating...' : 'Sign In Now'}
             </Button>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-border">
-            <p className="text-sm text-muted-foreground text-center mb-4">
-              Don&apos;t have an account?
+          <div className="mt-8 pt-6 border-t border-slate-700/50 text-center">
+            <p className="text-sm text-slate-400 mb-4">
+              Don't have an account?
             </p>
             <Link href="/register">
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full border-slate-700 text-slate-200 hover:bg-slate-800">
                 Create Account
               </Button>
             </Link>
