@@ -721,6 +721,7 @@ export default function TeacherDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const fetchTeams = useCallback(async () => {
     if (!user) return;
@@ -905,27 +906,54 @@ export default function TeacherDashboardPage() {
   if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b p-4 flex justify-between items-center bg-card">
-        <div>
-          <h1 className="text-xl font-bold">Teacher Dashboard</h1>
-          <p className="text-xs text-muted-foreground">Welcome, {user?.name}</p>
+    <div className="min-h-screen bg-background relative overflow-x-hidden">
+      {/* Mobile Backdrop */}
+      {isMobileMenuOpen && (
+        <div 
+          className="lg:hidden absolute inset-0 bg-black/50 z-40 backdrop-blur-sm"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      <header className="border-b p-4 sticky top-0 bg-card/80 backdrop-blur-md z-30 flex justify-between items-center px-4 lg:px-6">
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="lg:hidden p-2 hover:bg-muted rounded-lg"
+          >
+            {isMobileMenuOpen ? '✕' : '☰'}
+          </button>
+          <div>
+            <h1 className="text-xl font-black tracking-tight text-foreground">Teacher Dashboard</h1>
+            <p className="hidden sm:block text-[10px] text-muted-foreground uppercase font-black tracking-widest">Welcome, {user?.name}</p>
+          </div>
         </div>
-        <button onClick={() => { logout(); router.push('/login'); }} className="px-4 py-2 border rounded-lg text-sm">Logout</button>
+        <button onClick={() => { logout(); router.push('/login'); }} className="px-3 py-1.5 border border-border rounded-lg text-xs font-bold hover:bg-muted transition-colors">Logout</button>
       </header>
 
-      <main className="max-w-7xl mx-auto p-6 flex gap-6">
-        <aside className="w-64 flex-shrink-0">
-          <Button onClick={() => setShowCreateModal(true)} className="w-full mb-6 font-bold py-6 bg-primary text-primary-foreground shadow-lg hover:shadow-primary/20 transition-all">+ Create New Team</Button>
-          <Card className="p-4 shadow-sm border-border">
-            <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-4">Your Project Teams ({teacherTeams.length})</h3>
-            <div className="space-y-2">
+      <main className="max-w-7xl mx-auto p-4 lg:p-6 flex flex-col lg:flex-row gap-6">
+        <aside className={`fixed lg:static inset-y-0 left-0 w-72 lg:w-64 bg-card lg:bg-transparent z-50 lg:z-0 border-r lg:border-0 shadow-2xl lg:shadow-none transition-transform duration-300 transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} flex-shrink-0 p-6 lg:p-0`}>
+          <div className="lg:hidden flex items-center gap-3 mb-8">
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-bold italic">SP</div>
+            <h1 className="font-black text-xl tracking-tighter">SPFD <span className="text-primary text-[10px] uppercase font-bold tracking-widest block">Mentor</span></h1>
+          </div>
+
+          <Button onClick={() => { setShowCreateModal(true); setIsMobileMenuOpen(false); }} className="w-full mb-6 font-bold py-6 bg-primary text-primary-foreground shadow-lg hover:shadow-primary/20 transition-all">+ New Team</Button>
+          
+          <Card className="p-4 shadow-sm border-border bg-card/50 backdrop-blur-sm">
+            <h3 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-4">Project Teams ({teacherTeams.length})</h3>
+            <div className="space-y-2 max-h-[60vh] overflow-y-auto custom-scrollbar pr-1">
               {teacherTeams.length === 0 ? (
                 <p className="text-xs text-center py-4 text-muted italic">No teams found.</p>
               ) : (
                 teacherTeams.map(team => (
-                  <button key={team.id} onClick={() => pickTeam(team)} className={`w-full text-left p-3 rounded-xl border transition-all ${selectedTeam?.id === team.id ? 'bg-primary/10 border-primary text-primary shadow-sm' : 'border-border text-foreground hover:bg-muted/50'}`}>
+                  <button 
+                    key={team.id} 
+                    onClick={() => { pickTeam(team); setIsMobileMenuOpen(false); }} 
+                    className={`w-full text-left p-3 rounded-xl border transition-all ${selectedTeam?.id === team.id ? 'bg-primary/10 border-primary text-primary shadow-sm' : 'border-border text-foreground hover:bg-muted/50'}`}
+                  >
                     <p className="font-bold text-sm truncate">{team.name}</p>
+                    <p className="text-[9px] mt-0.5 opacity-60">Week {team.currentWeek} · {team.memberIds.length} Std</p>
                   </button>
                 ))
               )}
@@ -933,7 +961,7 @@ export default function TeacherDashboardPage() {
           </Card>
         </aside>
 
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 z-10">
           {selectedTeam ? (
             <TeamDetailPanel 
               team={selectedTeam} 
@@ -948,7 +976,9 @@ export default function TeacherDashboardPage() {
               }}
             />
           ) : (
-            <Card className="p-12 text-center">Select a team to view details.</Card>
+            <Card className="p-12 text-center bg-card/50 backdrop-blur-sm border-border/50 text-muted-foreground italic animate-pulse">
+              Select a team from the menu to view progress analysis.
+            </Card>
           )}
         </div>
       </main>

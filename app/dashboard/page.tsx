@@ -28,6 +28,7 @@ export default function DashboardPage() {
   const [weeklyEntries, setWeeklyEntries] = useState<any[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const [mentorName, setMentorName] = useState('Loading...');
 
@@ -284,39 +285,62 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-12">
-      <nav className="border-b bg-card py-4">
-        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-          <h1 className="text-xl font-bold flex items-center gap-2">🚀 Student Arena</h1>
+    <div className="min-h-screen bg-background pb-12 relative overflow-x-hidden">
+      {/* Mobile Sidebar for Team Selection */}
+      {isMobileMenuOpen && (
+        <div 
+          className="lg:hidden absolute inset-0 bg-black/50 z-40 backdrop-blur-sm"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Team Selection Sidebar (Mobile) */}
+      <aside className={`fixed lg:hidden inset-y-0 left-0 w-72 bg-card z-50 border-r border-border p-6 transition-transform duration-300 transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="font-black text-xl">My Projects</h2>
+          <button onClick={() => setIsMobileMenuOpen(false)}>✕</button>
+        </div>
+        <div className="space-y-3">
+          {teams.map(t => (
+            <button
+              key={t.id}
+              onClick={() => { selectTeam(t); setIsMobileMenuOpen(false); }}
+              className={`w-full text-left p-4 rounded-xl border transition-all ${selectedTeam?.id === t.id ? 'bg-primary/10 border-primary text-primary shadow-sm font-bold' : 'border-border text-muted-foreground'}`}
+            >
+              {t.name}
+            </button>
+          ))}
+        </div>
+      </aside>
+
+      <nav className="border-b bg-card/80 backdrop-blur-md py-4 sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto px-4 lg:px-6 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="lg:hidden p-2 hover:bg-muted rounded-lg"
+            >
+              ☰
+            </button>
+            <h1 className="text-xl font-black flex items-center gap-2">🚀 <span className="hidden sm:inline">Student Arena</span></h1>
+          </div>
           <div className="flex items-center gap-4">
-            <span className="text-sm font-semibold">{user?.name}</span>
-            <button onClick={handleLogout} className="text-sm text-muted-foreground hover:text-foreground transition-all">Logout</button>
+            <span className="text-xs font-black uppercase tracking-widest text-muted-foreground hidden sm:block">{user?.name}</span>
+            <button onClick={handleLogout} className="px-3 py-1.5 border border-border rounded-lg text-xs font-bold hover:bg-muted transition-all">Logout 👋</button>
           </div>
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
-        {notifications.length > 0 && (
-          <div className="space-y-3">
-            {notifications.map(n => (
-              <div key={n.id} className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex justify-between items-start">
-                <div>
-                  <h4 className="font-bold text-red-600 flex items-center gap-2 text-sm uppercase">⚠️ {n.title}</h4>
-                  <p className="text-xs text-red-600/80 mt-1 font-medium">{n.message}</p>
-                </div>
-                <button onClick={clearNotifications} className="text-[10px] uppercase font-black tracking-widest text-red-600 hover:underline">Dismiss</button>
-              </div>
-            ))}
-          </div>
-        )}
-        {/* Team Selection */}
+      <main className="max-w-7xl mx-auto px-4 py-6 lg:py-8 space-y-8">
+        {/* Desktop Team Selection Row */}
         {teams.length > 1 && (
-          <div className="flex gap-2 overflow-x-auto pb-2">
+          <div className="hidden lg:flex gap-2 overflow-x-auto pb-2 scroll-smooth">
             {teams.map(t => (
               <Button
                 key={t.id}
                 variant={selectedTeam?.id === t.id ? 'default' : 'outline'}
                 onClick={() => selectTeam(t)}
+                className="font-bold whitespace-nowrap rounded-xl"
               >
                 {t.name}
               </Button>
@@ -326,11 +350,11 @@ export default function DashboardPage() {
 
         {selectedTeam && (
           <>
-            <Card className="p-6">
-              <div className="flex justify-between items-start mb-6">
+            <Card className="p-6 relative overflow-hidden border-border/50 shadow-2xl bg-card/50 backdrop-blur-sm animate-in fade-in duration-700">
+               <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8">
                 <div>
-                  <h2 className="text-3xl font-bold">{selectedTeam.name}</h2>
-                  <p className="text-sm text-muted-foreground font-mono">ID: {selectedTeam.id}</p>
+                  <h2 className="text-3xl lg:text-4xl font-black tracking-tight">{selectedTeam.name}</h2>
+                  <p className="text-[10px] uppercase font-black tracking-[0.2em] text-muted-foreground opacity-60">Project ID: {selectedTeam.id}</p>
                 </div>
                 <RiskLevelBadge score={currentRiskScore} size="lg" />
               </div>
