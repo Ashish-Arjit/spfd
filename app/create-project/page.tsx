@@ -275,19 +275,26 @@ export default function CreateProjectPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen relative overflow-hidden flex flex-col items-center p-4 py-12">
+      {/* Background with Overlay */}
+      <div 
+        className="absolute inset-0 z-0 bg-cover bg-center"
+        style={{ backgroundImage: 'url("/bg-auth.jpg")' }}
+      />
+      <div className="absolute inset-0 z-1 bg-slate-950/80 backdrop-blur-md" />
+
+      <div className="max-w-2xl w-full relative z-10 animate-in fade-in zoom-in duration-500">
         <Button
           variant="outline"
           onClick={() => router.back()}
-          className="mb-8"
+          className="mb-8 border-slate-700/50 bg-slate-900/50 backdrop-blur-md text-white hover:bg-slate-800"
         >
-          ← Back
+          ← Back to Dashboard
         </Button>
 
-        <Card className="p-6 md:p-8 border-border bg-card">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Create New Project</h1>
-          <p className="text-muted-foreground mb-8">Set up a new team project and begin tracking progress</p>
+        <Card className="p-6 md:p-10 bg-slate-900/40 backdrop-blur-2xl border-slate-700/50 shadow-2xl">
+          <h1 className="text-3xl font-black text-white tracking-tight mb-2">Create New Project</h1>
+          <p className="text-slate-400 font-medium mb-8">Set up a new team project and begin tracking progress</p>
 
           {error && (
             <div className="mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
@@ -297,14 +304,14 @@ export default function CreateProjectPage() {
 
           <form onSubmit={handleCreateProject} className="space-y-8">
             <div className="space-y-6">
-              <h2 className="text-lg font-semibold text-foreground">Project & Mentor Assignment</h2>
+              <h2 className="text-lg font-bold text-slate-200">Project & Mentor Assignment</h2>
 
               <FieldGroup>
-                <FieldLabel>Assigned Teacher/Mentor</FieldLabel>
+                <FieldLabel className="text-slate-300">Assigned Teacher/Mentor</FieldLabel>
                 <select
                   value={selectedTeacherId}
                   onChange={(e) => setSelectedTeacherId(e.target.value)}
-                  className="w-full h-10 px-3 py-2 border border-input bg-background text-foreground rounded-md text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
+                  className="w-full h-12 px-3 py-2 border border-slate-700/50 bg-slate-800/50 text-white rounded-xl text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-primary"
                   required
                 >
                   <option value="">Select a teacher...</option>
@@ -313,68 +320,72 @@ export default function CreateProjectPage() {
                   ))}
                   {teachers.length === 0 && <option value="teacher_001">Teacher 001 (Default)</option>}
                 </select>
-                <p className="text-xs text-muted-foreground">The assigned teacher will oversee your progress and milestones.</p>
+                <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest mt-2">Oversees progress and milestones</p>
               </FieldGroup>
 
               <FieldGroup>
-                <FieldLabel>Project Name</FieldLabel>
+                <FieldLabel className="text-slate-300">Project Name</FieldLabel>
                 <Input
                   type="text"
                   placeholder="e.g., AI Research Initiative"
                   value={projectName}
                   onChange={(e: any) => setProjectName(e.target.value)}
                   required
+                  className="bg-slate-800/50 border-slate-700/50 text-white h-12"
                 />
               </FieldGroup>
 
               <FieldGroup>
-                <FieldLabel>Team Name</FieldLabel>
+                <FieldLabel className="text-slate-300">Team Name</FieldLabel>
                 <Input
                   type="text"
                   placeholder="e.g., AI Research Team"
                   value={teamName}
                   onChange={(e: any) => setTeamName(e.target.value)}
                   required
+                  className="bg-slate-800/50 border-slate-700/50 text-white h-12"
                 />
               </FieldGroup>
             </div>
 
             <div className="space-y-6">
-              <h2 className="text-lg font-semibold text-foreground">Team Members</h2>
-              <p className="text-sm text-muted-foreground">
-                You are automatically set as the team lead. Add team members by entering their name and email address.
+              <h2 className="text-lg font-bold text-slate-200">Team Members</h2>
+              <p className="text-sm text-slate-400">
+                You are automatically set as the team lead.
               </p>
 
-              <div className="p-4 bg-primary/10 border border-primary rounded-lg">
+              <div className="p-4 bg-primary/10 border border-primary/20 rounded-xl">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium text-foreground">{user?.name}</p>
-                    <p className="text-sm text-muted-foreground">{user?.email}</p>
+                    <p className="font-bold text-white">{user?.name}</p>
+                    <p className="text-xs text-slate-400">{user?.email}</p>
                   </div>
-                  <span className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded">Team Lead</span>
+                  <span className="text-[9px] font-black uppercase tracking-widest bg-primary text-white px-2 py-1 rounded">Team Lead</span>
                 </div>
               </div>
 
-              <div className="space-y-4 p-4 bg-muted/50 border border-border rounded-lg">
-                <h3 className="font-medium text-foreground">Add Team Member</h3>
+              <div className="space-y-4 p-5 bg-slate-800/40 border border-slate-700/50 rounded-2xl">
+                <h3 className="font-bold text-slate-200 text-sm">Add Team Member</h3>
                 
                 <FieldGroup>
-                  <FieldLabel className="text-sm">Member Name</FieldLabel>
+                  <FieldLabel className="text-xs text-slate-400">Member Name</FieldLabel>
                   <Input
                     type="text"
                     placeholder="e.g., John Doe"
                     value={memberName}
                     onChange={(e: any) => setMemberName(e.target.value)}
+                    className="bg-slate-900/50 border-slate-700/50 text-white"
                   />
                 </FieldGroup>
 
                 <FieldGroup>
-                  <FieldLabel className="text-sm">Member Email</FieldLabel>
+                  <FieldLabel className="text-xs text-slate-400">Member Email</FieldLabel>
                   <Input
                     type="email"
                     placeholder="e.g., john@college.edu"
                     value={memberEmail}
                     onChange={(e: any) => setMemberEmail(e.target.value)}
+                    className="bg-slate-900/50 border-slate-700/50 text-white"
                   />
                 </FieldGroup>
 
@@ -382,7 +393,7 @@ export default function CreateProjectPage() {
                   type="button"
                   onClick={(e) => handleAddMember(e)}
                   variant="outline"
-                  className="w-full"
+                  className="w-full border-primary/20 text-primary hover:bg-primary/10"
                 >
                   + Add Member
                 </Button>
@@ -390,20 +401,20 @@ export default function CreateProjectPage() {
 
               {teamMembers.length > 1 && (
                 <div className="space-y-3">
-                  <h3 className="font-medium text-foreground text-sm">Team Members ({teamMembers.length})</h3>
+                  <h3 className="font-black text-slate-500 text-[10px] uppercase tracking-widest">Team Members ({teamMembers.length})</h3>
                   {teamMembers.map(member => (
                     !member.isLead && (
-                      <div key={member.id} className="flex items-center justify-between p-3 border border-border rounded-lg">
+                      <div key={member.id} className="flex items-center justify-between p-3 bg-slate-800/30 border border-slate-700/50 rounded-xl">
                         <div className="min-w-0 flex-1">
-                          <p className="font-medium text-foreground text-sm truncate">{member.name}</p>
-                          <p className="text-xs text-muted-foreground truncate">{member.email}</p>
+                          <p className="font-bold text-white text-sm truncate">{member.name}</p>
+                          <p className="text-[10px] text-slate-400 truncate">{member.email}</p>
                         </div>
                         <Button
                           type="button"
                           onClick={() => handleRemoveMember(member.id)}
                           variant="ghost"
                           size="sm"
-                          className="text-destructive hover:text-destructive/80"
+                          className="text-red-400 hover:text-red-500 hover:bg-red-500/10"
                         >
                           Remove
                         </Button>
@@ -412,23 +423,14 @@ export default function CreateProjectPage() {
                   ))}
                 </div>
               )}
-
-              <div className="p-4 bg-muted rounded-lg">
-                <p className="text-sm font-medium text-foreground">
-                  Total Members: {teamMembers.length}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {teamMembers.length === 1 ? 'Solo project' : `${teamMembers.length} team members`}
-                </p>
-              </div>
             </div>
 
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 py-3"
+              className="w-full bg-primary text-white font-black uppercase tracking-widest hover:bg-primary/90 py-4 shadow-lg shadow-primary/20 transition-all active:scale-[0.98]"
             >
-              {loading ? 'Creating Project...' : 'Create Project & Start'}
+              {loading ? 'Creating Project...' : 'Initialize Project'}
             </Button>
           </form>
         </Card>

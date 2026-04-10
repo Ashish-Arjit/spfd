@@ -298,7 +298,10 @@ export default function DashboardPage() {
       <aside className={`fixed lg:hidden inset-y-0 left-0 w-72 bg-card z-50 border-r border-border p-6 transition-transform duration-300 transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex justify-between items-center mb-8">
           <h2 className="font-black text-xl">My Projects</h2>
-          <button onClick={() => setIsMobileMenuOpen(false)}>✕</button>
+          <div className="flex items-center gap-2">
+            <Link href="/create-project" className="w-8 h-8 rounded-lg bg-primary/20 text-primary flex items-center justify-center font-bold hover:bg-primary hover:text-white transition-all">+</Link>
+            <button onClick={() => setIsMobileMenuOpen(false)} className="p-2">✕</button>
+          </div>
         </div>
         <div className="space-y-3">
           {teams.map(t => (
@@ -325,6 +328,9 @@ export default function DashboardPage() {
             <h1 className="text-xl font-black flex items-center gap-2">🚀 <span className="hidden sm:inline">Student Arena</span></h1>
           </div>
           <div className="flex items-center gap-4">
+            <Link href="/create-project" className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary border border-primary/20 rounded-lg text-xs font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all italic">
+              + New Project
+            </Link>
             <span className="text-xs font-black uppercase tracking-widest text-muted-foreground hidden sm:block">{user?.name}</span>
             <button onClick={handleLogout} className="px-3 py-1.5 border border-border rounded-lg text-xs font-bold hover:bg-muted transition-all">Logout 👋</button>
           </div>
