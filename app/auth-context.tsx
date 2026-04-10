@@ -23,7 +23,7 @@ interface AuthContextType {
     }
   ) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
-  verifyIdentity: (email: string, enrollment: string, idCardFile: File) => Promise<{ success: boolean; error?: string }>;
+  verifyIdentity: (email: string, enrollment: string, idCardFile: File, isRecovery?: boolean) => Promise<{ success: boolean; error?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -49,11 +49,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           .single();
 
         if (profile && !error) {
-          const p = profile as any;
+          const p = profile as ProfileRow;
           setUser({
             id: p.id,
-            name: p.name || p.email?.split('@')[0] || 'User',
-            email: p.email,
+            name: p.email?.split('@')[0] || 'User', // Note: Get name from email as profiles table lacks name col
+            email: p.email || '',
             role: (p.role as UserRole) || 'student',
             password: '',
             collegeIdVerified: p.verified || false,
@@ -131,13 +131,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       // 1. Sign up user in Supabase Auth
-      console.log('Step 1: Auth Sign-up...');
+      console.log('Step 1: Auth Sign-up for', email);
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
       });
 
       if (authError) {
+        console.error('Auth Sign-up Error:', JSON.stringify(authError, null, 2));
         if (authError.message.includes('already registered')) {
             throw new Error('An account with this email already exists. Please login instead.');
         }
@@ -162,7 +163,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       // 3. Create entry in profiles table
-      console.log('Step 3: Profiles Insert...');
+      console.log('Step 3: Creating Profile Record for', userId);
       const { error: profileError } = await (supabase.from('profiles') as any).insert({
         id: userId,
         email: email,
@@ -173,7 +174,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (profileError) {
-        console.error('Profile DB error:', profileError);
+        console.error('Profile DB Insert Error:', JSON.stringify(profileError, null, 2));
         throw profileError;
       }
 
@@ -210,7 +211,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { success: true };
     } catch (err: any) {
       console.error('Registration full error object:', JSON.stringify(err, null, 2));
-      const errorMessage = err?.message || err?.error_description || err?.details || (typeof err === 'string' ? err : 'Check console for full error object');
+      const errorMessage = err?.message || err?.error_description || (typeof err === 'string' ? err : 'Registration failed. Please try again.');
       return { success: false, error: errorMessage };
     }
   };
@@ -219,7 +220,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await supabase.auth.signOut();
   };
 
-  const verifyIdentity = async (email: string, enrollment: string, idCardFile: File, isRecovery: boolean = true): Promise<{ success: boolean; error?: string }> => {
+  const verifyIdentity = async (email: string, enrollment: string, idCardFile: File, isRecovery: boolean = false): Promise<{ success: boolean; error?: string }> => {
     try {
       // 1. If in Recovery mode, check if user exists
       if (isRecovery) {
@@ -261,7 +262,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, verifyIdentity: (em, en, fi) => verifyIdentity(em, en, fi, true) }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, verifyIdentity: (em, en, fi, isRec = true) => verifyIdentity(em, en, fi, isRec) }}>
       {children}
     </AuthContext.Provider>
   );
