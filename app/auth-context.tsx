@@ -123,7 +123,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       // 0. Student ID Verification
       if (role === 'student') {
-        const verifyResult = await verifyIdentity(email, additionalData?.enrollment || '', collegeIdFile);
+        // Pass false for isRecovery because this is a new registration
+        const verifyResult = await verifyIdentity(email, additionalData?.enrollment || '', collegeIdFile, false);
         if (!verifyResult.success) {
           throw new Error(verifyResult.error);
         }
@@ -137,7 +138,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (authError) {
-        console.error('Auth Error details:', { message: authError.message, status: authError.status });
+        if (authError.message.includes('already registered')) {
+            throw new Error('An account with this email already exists. Please login instead.');
+        }
         throw authError;
       }
       if (!authData.user) throw new Error('User creation failed');
@@ -208,7 +211,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { success: true };
     } catch (err: any) {
       console.error('Registration full error object:', JSON.stringify(err, null, 2));
-      // Ensure we extract a string message
       const errorMessage = err?.message || err?.error_description || err?.details || (typeof err === 'string' ? err : 'Check console for full error object');
       return { success: false, error: errorMessage };
     }
@@ -218,17 +220,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await supabase.auth.signOut();
   };
 
-  const verifyIdentity = async (email: string, enrollment: string, idCardFile: File): Promise<{ success: boolean; error?: string }> => {
+  const verifyIdentity = async (email: string, enrollment: string, idCardFile: File, isRecovery: boolean = true): Promise<{ success: boolean; error?: string }> => {
     try {
-      // 1. Check if user exists in profiles table
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('email', email)
-        .single();
+      // 1. If in Recovery mode, check if user exists
+      if (isRecovery) {
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('email', email)
+          .single();
 
-      if (profileError || !profile) {
-        return { success: false, error: 'No account found with this email address.' };
+        if (profileError || !profile) {
+          return { success: false, error: 'No account found with this email address.' };
+        }
       }
 
       // 2. Call SPFD-1 Verification API
@@ -258,7 +262,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, verifyIdentity }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, verifyIdentity: (em, en, fi) => verifyIdentity(em, en, fi, true) }}>
       {children}
     </AuthContext.Provider>
   );
