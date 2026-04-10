@@ -166,10 +166,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { error: profileError } = await (supabase.from('profiles') as any).insert({
         id: userId,
         email: email,
-        name: name,
         role: role as string,
         id_card_image: filePath,
         verified: false,
+        roll_number: additionalData?.enrollment || null // Match database column name
       });
 
       if (profileError) {
@@ -198,7 +198,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           email: email,
           phone_number: additionalData?.phone || null,
           university: additionalData?.university || null,
-          enrollment_number: additionalData?.enrollment || null,
           id_card_url: filePath,
         });
         if (teacherError) {
