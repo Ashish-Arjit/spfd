@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Student ID Verification</title>
+
+    ```
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    ```
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>Student Registration</h1>
+
+        <form id="verificationForm" action="/register" method="POST" enctype="multipart/form-data">
+
+            <label>Roll Number</label> <input type="text" id="roll" name="roll" placeholder="SXXCSEUXXXX" required>
+
+            <label>Upload ID Card</label> <input type="file" id="id_card" name="id_card" accept="image/*" required>
+
+            <button type="submit">Verify & Register</button>
+
+        </form>
+
+    </div>
+
+    <script src="{{ url_for('static', filename='js/verification.js') }}"></script>
+
+</body>
+
+</html>

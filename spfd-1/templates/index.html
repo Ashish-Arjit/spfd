@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <title>Student Project Monitoring System</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .home-container {
+            width: 450px;
+            margin: 120px auto;
+            text-align: center;
+        }
+
+        .home-container h1 {
+            margin-bottom: 40px;
+        }
+
+        .nav-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        .nav-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="home-container">
+
+        <h1>Student Project Monitoring System</h1>
+
+        <a class="nav-btn" href="/student_auth">Student Registration</a>
+
+        <a class="nav-btn" href="/teacher_auth">Teacher Login</a>
+
+    </div>
+
+</body>
+
+</html>
